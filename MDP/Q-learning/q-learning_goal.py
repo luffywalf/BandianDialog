@@ -109,7 +109,6 @@ class Train():
         return next_state, reward, terminal
 
     def q_learning(self, num_episodes=10000, alpha=0.5, epsilon=0.3, span=100):
-        f = open('../data/train_reward_log.txt', 'wt')
         reward_log_epi_list = []
         metrics = []
         check_R = 0
@@ -127,7 +126,6 @@ class Train():
 
         for ith in range(1, num_episodes + 1):  # 大循环
             reward_log_turn_list = []
-            f.write("here is %d:\n" % ith)
             count += 1
             state_list = [0,0,0]
             R = 0
@@ -137,7 +135,7 @@ class Train():
                 state_num = self.state_2_statenum(state_list)
                 action = self.policy(self.Q, state_num, epsilon)
                 next_state_list, reward, terminal= self.step(state_list, action, t)
-                f.write(str(reward) +" "+str(state_list) +" " +str(action)+"\n")
+
                 reward_log_turn_list.append(reward)
 
                 check_R += reward
@@ -243,14 +241,12 @@ class Train():
     def q_learning_test(self, num_episodes=10000, epsilon=0, span=100):
         # self.Q = np.load('data/Q_Table_done.npy')
         self.Q = np.load('data/Q_Table.npy')
-        f = open('data/test_reward_log.txt', 'wt')
         reward_log_epi_list = []
 
         t_reward_list = []
         t_check_if_suc_flag = 0
         t_check_if_suc_list = []
         for ith in range(1, num_episodes + 1):  # 大循环
-            f.write("here is %d:\n" % ith)
             reward_log_turn_list = []
             state_list = [0, 0, 0]
 
@@ -267,7 +263,6 @@ class Train():
                 next_state_list, reward, terminal = self.step(state_list, action, t)
                 reward_log_turn_list.append(reward)
 
-                f.write(str(reward)+"\n")
                 t_reward += 1
                 if reward == 20:
                     t_reward_list.append(t_reward)

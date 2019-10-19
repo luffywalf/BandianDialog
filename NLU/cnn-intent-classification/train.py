@@ -62,7 +62,7 @@ def preprocess():
     vocab_processor.save("data/processor.vocab")
     print("vocab_processor has saved...")
     print(len(vocab_processor.vocabulary_))
-    a=input()
+
     x_intent = np.array(list(vocab_processor.transform(x_text_intent)))
 
     # only neg data is random, so below
@@ -371,9 +371,9 @@ def main(argv=None):
     x, y, vocab_processor = preprocess()
 
     # cv_test(x, y, vocab_processor)
-    # one_time_train_test(x, y, vocab_processor)
+    one_time_train_test(x, y, vocab_processor)
 
-    test_unit(x, y, vocab_processor)
+    # test_unit(x, y, vocab_processor)
 
 
 if __name__ == '__main__':

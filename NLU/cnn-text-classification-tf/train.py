@@ -357,8 +357,8 @@ def main(argv=None):
     x, y, vocab_size, max_len,word_embedding, sr_word2id= preprocess()
     # x, y, vocab_processor = preprocess()
     # cv_test(x, y, vocab_processor)
-    # one_time_train_test(x, y, vocab_size, word_embedding)
-    test_unit(x, y, vocab_size,max_len,word_embedding, sr_word2id)
+    one_time_train_test(x, y, vocab_size, word_embedding)
+    # test_unit(x, y, vocab_size,max_len,word_embedding, sr_word2id)
 
 
 if __name__ == '__main__':
