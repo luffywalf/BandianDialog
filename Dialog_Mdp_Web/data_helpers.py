@@ -192,7 +192,7 @@ def sent_to_input(q, vocab_processor):
     # return np.array([x_seq])
     # return np.array([x_text])
 
-def load_data_and_labels_for_test(text, max_document_length,sr_word2id):
+def load_data_and_labels_for_test(text, max_document_length, sr_word2id):
     x_text = []
     for q in text:
         x_text.append(" ".join(jieba.cut(q, cut_all=False)))

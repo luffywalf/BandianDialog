@@ -202,9 +202,6 @@ def test(cnn, sess, x_train, y_train, x_test, y_test, vocab_processor):
     test_loss, test_acc, test_pred, test_label = sess.run([cnn.loss, cnn.accuracy, cnn.predictions, cnn.label],
                                                           feed_dict)
 
-    # print(test_p2)
-    # test_p2 = [1 for x in test_p2 if x]
-    # print("three acc:", sum(test_p2)/len(test_p2))
     print('val_loss:%f, val_acc:%f' % (test_loss, test_acc))
 
     pre = precision_score(test_label, test_pred, average='macro')

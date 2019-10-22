@@ -1,8 +1,5 @@
 import tensorflow as tf
 # tf.reset_default_graph()
-import numpy as np
-from data_helpers import build_glove_dic
-
 
 
 class TextCNN(object):
@@ -12,7 +9,7 @@ class TextCNN(object):
     """
     def __init__(
       self, sequence_length, num_classes, vocab_size,
-      embedding_size, word_embedding ,filter_sizes, num_filters, l2_reg_lambda=0.0):
+      embedding_size, word_embedding ,filter_sizes, num_filters, if_one_entity, l2_reg_lambda=0.0):
 
         # Placeholders for input, output and dropout
         self.input_x = tf.placeholder(tf.int32, [None, sequence_length], name="input_x")
@@ -32,11 +29,6 @@ class TextCNN(object):
             #     name="W")
             self.embedded_chars = tf.nn.embedding_lookup(self.W, self.input_x)
             self.embedded_chars_expanded = tf.expand_dims(self.embedded_chars, -1)
-
-        print("self.input_x:", self.input_x)
-        print("self.embedded_chars:", self.embedded_chars)
-        print("self.embedded_chars_expanded:", self.embedded_chars_expanded)
-
 
         # Create a convolution + maxpool layer for each filter size
         pooled_outputs = []
@@ -77,7 +69,6 @@ class TextCNN(object):
 
         # Final (unnormalized) scores and predictions
         with tf.name_scope("output") as scope:
-        # with tf.name_scope("output"):
             W = tf.get_variable(
                 scope + "W",
                 shape=[num_filters_total, num_classes],
@@ -86,47 +77,23 @@ class TextCNN(object):
             l2_loss += tf.nn.l2_loss(W)  # 这个应该是正则项
             l2_loss += tf.nn.l2_loss(b)
             self.scores = tf.nn.xw_plus_b(self.h_drop, W, b, name="scores")
-            print("self.h_drop:", self.h_drop)
-            print("self.scores:", self.scores)
-
-            self.sig_scores = tf.sigmoid(self.scores, name="sig_scores")
+            if not if_one_entity:
+                self.sig_scores = tf.sigmoid(self.scores, name="sig_scores")
             self.predictions = tf.argmax(self.scores, 1, name="predictions")
-            # self.predictions2 = tf.nn.top_k(self.scores, 3, name="predictions")
             self.label = tf.argmax(self.input_y, 1, name="label")
-            # self.predictions2 = tf.nn.in_top_k(self.scores,self.label, 3, name="predictions2")
-            self.predictions3 = tf.nn.top_k(self.scores, 2, name="predictions3")
 
         # Calculate mean cross-entropy loss
         with tf.name_scope("loss"):
-            # # losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.scores, labels=self.input_y)
-            losses = tf.nn.sigmoid_cross_entropy_with_logits(logits=self.scores, labels=self.input_y)
+            if if_one_entity:
+                losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.scores, labels=self.input_y)
+            else:
+                losses = tf.nn.sigmoid_cross_entropy_with_logits(logits=self.scores, labels=self.input_y)
             self.loss = tf.reduce_mean(losses) + l2_reg_lambda * l2_loss
-
-            # losses = tf.nn.sigmoid_cross_entropy_with_logits(labels=self.input_y, logits=self.scores)
-            # losses = tf.reduce_mean(tf.reduce_sum(losses, axis=1), name="sigmoid_losses")
-            # l2_losses = tf.add_n([tf.nn.l2_loss(tf.cast(v, tf.float32)) for v in tf.trainable_variables()],
-            #                      name="l2_losses") * l2_reg_lambda
-            # self.loss = tf.add(losses, l2_losses, name="loss")
 
         # Accuracy
         with tf.name_scope("accuracy"):
             #  tf.argmax(self.input_y, 1) 1 refers to row; tf.equal return true or false;
             #  here name="x" for train.py to find x
-            # self.label = tf.argmax(self.input_y, 1, name="label")
             correct_predictions = tf.equal(self.predictions, self.label)
             #  tf.cast to change type; tf.reduce_mean to get mean from all the numbers
             self.accuracy = tf.reduce_mean(tf.cast(correct_predictions, "float"), name="accuracy")
-
-        # with tf.name_scope("sub_pre"):
-        #     #  tf.argmax(self.input_y, 1) 1 refers to row; tf.equal return true or false;
-        #     #  here name="x" for train.py to find x
-        #     # self.label = tf.argmax(self.input_y, 1, name="label")
-        #     correct_predictions = tf.reduce_all(tf.equal(self.sig_scores, self.input_y), axis=1)  #axis=1 每一行的和
-        #     # correct_predictions = tf.equal(self.predictions, self.label)
-        #     #  tf.cast to change type; tf.reduce_mean to get mean from all the numbers
-        #     self.sub_pre = tf.reduce_mean(tf.cast(correct_predictions, "float"), name="sub_pre")
-        #
-        #     self.co = tf.equal(self.sig_scores, self.input_y)
-        #     self.correct_predictions = correct_predictions
-
-

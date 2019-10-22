@@ -35,6 +35,7 @@ tf.flags.DEFINE_integer("multilabel_threshold", 0.5, "multilabel_threshold (defa
 # Misc Parameters
 tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
 tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
+tf.flags.DEFINE_boolean("if_one_entity", True, "NLU if one entity")
 
 FLAGS = tf.flags.FLAGS
 
@@ -43,7 +44,7 @@ class NLU:
     def __init__(self):
         self.word2id_pkl_path = "/Users/dingning/Ding/Python/VE/BUPT/DialogKB/NLU/cnn-text-classification-tf/PKL/sgns.chinese/word2id.pkl"
         self.word_emb_path = "/Users/dingning/Ding/Python/VE/BUPT/DialogKB/NLU/cnn-text-classification-tf/PKL/sgns.chinese/word_embedding.npy"
-        self.text_model_path = "/Users/dingning/Ding/Python/VE/BUPT/DialogKB/NLU/cnn-text-classification-tf/runs_bandian/1554965249/checkpoints/"
+        self.text_model_path = "/Users/dingning/Ding/Python/VE/BUPT/DialogKB/Bandian_Dialog/NLU/cnn-text-classification-tf/runs_bandian/1571543056/checkpoints"
         self.intent_vocab_pro = "src/generate/processor.vocab"
         self.intent_model_path = "/Users/dingning/Ding/Python/VE/BUPT/DialogKB/NLU/cnn-intent-classification/runs_bandian/1544259188/checkpoints"
         self.bandian_node = "/Users/dingning/Ding/Python/VE/BUPT/DialogKB/NLU/resources/database/node_bandian_q_pos.csv"
@@ -200,21 +201,19 @@ class NLU:
         return id
 
 
-    def map(self, input_x, multi_entity=True):
+    def map(self, input_x):
         # args: sequence_length, num_classes, vocab_processor, model_path, input_x
         # model path 在初始化里改
-
         x_test = data_helpers.load_data_and_labels_for_test([input_x], 52, self.sr_word2id)
-
         feed_dict = {
             self.cnn.input_x: x_test,
             self.cnn.dropout_keep_prob: 1.0
         }
+
         pred_class = []
-        if multi_entity:
+        if not FLAGS.if_one_entity:
             test_sig_scores, scores = self.sess.run([self.cnn.sig_scores, self.cnn.scores], feed_dict)
             one_hot_scores = data_helpers.to_one_hot_scores(test_sig_scores, FLAGS.multilabel_threshold)
-            print(one_hot_scores)
 
             # 只有一句话
             # 这里跟初始NLU不同 若没有1的情况 就只取其中的max
@@ -226,13 +225,6 @@ class NLU:
                         pred_class.append(j)
 
         else:
-            x_test = self.sent_to_input(input_x, self.vocab_processor)
-
-            feed_dict = {
-                self.cnn.input_x: x_test,
-                self.cnn.dropout_keep_prob: 1.0
-            }
-
             test_pred = self.sess.run([self.cnn.predictions], feed_dict)
             pred_class.append(test_pred[0][0])
 

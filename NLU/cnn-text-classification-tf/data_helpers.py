@@ -8,6 +8,9 @@ from gensim.models import KeyedVectors
 import pickle as pkl
 import time
 
+word2id_pkl_path = "/Users/dingning/Ding/Python/VE/BUPT/DialogKB/NLU/cnn-text-classification-tf/PKL/sgns.chinese/word2id.pkl"
+word_emb_path = "/Users/dingning/Ding/Python/VE/BUPT/DialogKB/NLU/cnn-text-classification-tf/PKL/sgns.chinese/word_embedding.npy"
+
 
 def build_glove_dic():
     # print("1:")
@@ -89,8 +92,8 @@ def build_glove_dic():
     word_embedding = np.vstack([word_mean, word_embedding])
     print("final embed len:", len(word_embedding))
 
-    sr_word2id.to_pickle("PKL/sgns.chinese/word2id.pkl")  # python3 no protocol python2 protocol=2
-    np.save('PKL/sgns.chinese/word_embedding.npy', word_embedding)
+    sr_word2id.to_pickle("src/generate/PKL/word2id.pkl")  # python3 no protocol python2 protocol=2
+    np.save('src/generate/PKL/word_embedding.npy', word_embedding)
     print("word_embedding loaded...")
 
     return sr_word2id, word_embedding
@@ -163,10 +166,9 @@ def load_data_and_labels_for_test(df, max_document_length,sr_word2id):
     return x_seq
 
 
-
-def load_data_and_labels(df):
+def load_data_and_labels_two_entities(df):
     '''
-    
+    for 双实体
     :param df: 
     :return: [x_text, y]
     
@@ -179,16 +181,14 @@ def load_data_and_labels(df):
     print("start load_data_and_labels...")
     t1 = time.time()
     # sr_word2id, word_embedding = build_glove_dic()
-    sr_word2id = pd.read_pickle("PKL/sgns.chinese/word2id.pkl")
-    word_embedding = np.load("PKL/sgns.chinese/word_embedding.npy")
+    sr_word2id = pd.read_pickle(word2id_pkl_path)
+    word_embedding = np.load(word_emb_path)
     t2 = time.time()
     print("Vocabulary Size: {:d}".format(len(sr_word2id)))
     print("load emd use time:", t2-t1)
     vocab_size = len(sr_word2id)
 
     # 1
-    # y = pd.get_dummies(df["class_label"]).values
-    # df = pd.read_csv("../resources/database/two_class_1500.csv")
     num_labels = len(df)
     num_classes = 60
     labels_one_hot = np.zeros((num_labels, num_classes))
@@ -201,10 +201,7 @@ def load_data_and_labels(df):
             l = l.split(",")
             a[int(l[0])], a[int(l[1])] = 1, 1
 
-
     y = labels_one_hot
-
-
     x_text = []
     for q in df["user_q"]:
         x_text.append(" ".join(jieba.cut(q, cut_all=False)))
@@ -239,9 +236,9 @@ def load_data_and_labels(df):
     # return x_seq, y, vocab_size, max_document_length
 
 
-def load_data_and_labels_for_train_copy(df):
+def load_data_and_labels_one_entity(df):
     '''
-
+    for 单实体
     :param df:
     :return: [x_text, y]
 
@@ -252,8 +249,8 @@ def load_data_and_labels_for_train_copy(df):
     print("start load_data_and_labels...")
     t1 = time.time()
     # sr_word2id, word_embedding = build_glove_dic()
-    sr_word2id = pd.read_pickle("PKL/sgns.chinese/word2id.pkl")
-    word_embedding = np.load("PKL/sgns.chinese/word_embedding.npy")
+    sr_word2id = pd.read_pickle(word2id_pkl_path)
+    word_embedding = np.load(word_emb_path)
     t2 = time.time()
     print("Vocabulary Size: {:d}".format(len(sr_word2id)))
     print("load emd use time:", t2 - t1)

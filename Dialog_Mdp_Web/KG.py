@@ -1,5 +1,5 @@
 #coding=utf-8
-from treelib import Tree, Node
+from treelib import Tree
 import numpy as np
 import copy
 import pandas as pd
@@ -48,8 +48,6 @@ class KG:
         # tree.create_node("流程", 13, parent=12)
         # tree.create_node("材料", 14, parent=13)
         # tree.create_node("主体证明", 15, parent=3)
-
-        tree.show()
 
         return tree
 

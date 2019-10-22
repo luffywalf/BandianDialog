@@ -38,6 +38,7 @@ tf.flags.DEFINE_integer("multilabel_threshold", 0.5, "multilabel_threshold (defa
 # Misc Parameters
 tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
 tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
+tf.flags.DEFINE_boolean("if_one_entity", True, "NLU if one entity")
 
 FLAGS = tf.flags.FLAGS
 
@@ -48,14 +49,18 @@ def preprocess():
     # Load data
     print("Loading data...")
 
-    # for bandian
-    df_bandian_pos = pd.read_csv("../resources/database/bandian_q_pos_copy.csv")
-    df_two_class = pd.read_csv("../resources/database/two_class_1500.csv")
-    df = pd.concat([df_bandian_pos, df_bandian_pos, df_bandian_pos,df_two_class])
+    if not FLAGS.if_one_entity:
+        df_bandian_pos = pd.read_csv("../resources/database/bandian_q_pos_copy.csv")
+        df_two_class = pd.read_csv("../resources/database/two_class_1500.csv")
+        df = pd.concat([df_bandian_pos, df_bandian_pos, df_bandian_pos,df_two_class])
+        x_text, y, vocab_size, max_document_length, word_embedding, sr_word2id = \
+            data_helpers.load_data_and_labels_two_entities(df)
+    else:
+        df_bandian_pos = pd.read_csv("../resources/database/bandian_q_pos.csv")
+        df = pd.concat([df_bandian_pos, df_bandian_pos, df_bandian_pos])
+        x_text, y, vocab_size, max_document_length, word_embedding, sr_word2id = \
+            data_helpers.load_data_and_labels_one_entity(df)
 
-
-    # get data
-    x_text, y, vocab_size, max_document_length,word_embedding, sr_word2id = data_helpers.load_data_and_labels(df)
     x_text = np.array(x_text)
     y = np.array(y)
 
@@ -67,11 +72,6 @@ def preprocess():
     # print("vocab_processor has saved...")
     # print(len(vocab_processor.vocabulary_))
 
-
-    # only neg data is random, so below
-    # x, x_dev, y, y_dev = train_test_split(x, y, test_size=0, random_state=42)
-
-    # return x, y,vocab_processor
     return x_text, y, vocab_size, max_document_length, word_embedding, sr_word2id
 
 
@@ -94,6 +94,7 @@ def train(x_train, y_train, vocab_size, x_dev, y_dev, word_embedding):
                 word_embedding = word_embedding,
                 filter_sizes=list(map(int, FLAGS.filter_sizes.split(","))),
                 num_filters=FLAGS.num_filters,
+                if_one_entity=FLAGS.if_one_entity,
                 l2_reg_lambda=FLAGS.l2_reg_lambda)
 
             # Define Training procedure
@@ -153,17 +154,25 @@ def train(x_train, y_train, vocab_size, x_dev, y_dev, word_embedding):
                     cnn.input_y: y_batch,
                     cnn.dropout_keep_prob: FLAGS.dropout_keep_prob
                 }
-                _, step, summaries, loss, sig_scores= sess.run(
-                    [train_op, global_step, train_summary_op, cnn.loss, cnn.sig_scores],
-                    feed_dict)
-                one_hot_scores = data_helpers.to_one_hot_scores(sig_scores, FLAGS.multilabel_threshold)
 
-                subset_acc = accuracy_score(one_hot_scores, np.array(y_batch))
-                time_str = datetime.datetime.now().isoformat()
-                print("{}: step {}, loss {:g}, subset_acc {:g}".format(time_str, step, loss, subset_acc))
-                train_summary_writer.add_summary(summaries, step)
-
-                return subset_acc
+                if FLAGS.if_one_entity:
+                    _, step, summaries, loss, accuracy = sess.run(
+                        [train_op, global_step, train_summary_op, cnn.loss, cnn.accuracy],
+                        feed_dict)
+                    time_str = datetime.datetime.now().isoformat()
+                    print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
+                    train_summary_writer.add_summary(summaries, step)
+                    return accuracy
+                else:
+                    _, step, summaries, loss, sig_scores = sess.run(
+                        [train_op, global_step, train_summary_op, cnn.loss, cnn.sig_scores],
+                        feed_dict)
+                    one_hot_scores = data_helpers.to_one_hot_scores(sig_scores, FLAGS.multilabel_threshold)
+                    subset_acc = accuracy_score(one_hot_scores, np.array(y_batch))
+                    time_str = datetime.datetime.now().isoformat()
+                    print("{}: step {}, loss {:g}, subset_acc {:g}".format(time_str, step, loss, subset_acc))
+                    train_summary_writer.add_summary(summaries, step)
+                    return subset_acc
 
 
             def dev_step(x_batch, y_batch, writer=None):
@@ -175,18 +184,28 @@ def train(x_train, y_train, vocab_size, x_dev, y_dev, word_embedding):
                     cnn.input_y: y_batch,
                     cnn.dropout_keep_prob: 1.0
                 }
-                step, summaries, loss, sig_scores= sess.run(
-                    [global_step, dev_summary_op, cnn.loss, cnn.sig_scores],
-                    feed_dict)
-                one_hot_scores = data_helpers.to_one_hot_scores(sig_scores, FLAGS.multilabel_threshold)
-                subset_acc = accuracy_score(one_hot_scores, y_batch)
-                ham_loss = hamming_loss(one_hot_scores, y_batch)
-                time_str = datetime.datetime.now().isoformat()
-                print("{}: step {}, loss {:g}, ham {:g}, sub_acc {:g}".format(time_str, step, loss, ham_loss, subset_acc))
-                if writer:
-                    writer.add_summary(summaries, step)
-
-                return subset_acc
+                if FLAGS.if_one_entity:
+                    step, summaries, loss, accuracy = sess.run(
+                        [global_step, dev_summary_op, cnn.loss, cnn.accuracy],
+                        feed_dict)
+                    time_str = datetime.datetime.now().isoformat()
+                    print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
+                    if writer:
+                        writer.add_summary(summaries, step)
+                    return accuracy
+                else:
+                    step, summaries, loss, sig_scores= sess.run(
+                        [global_step, dev_summary_op, cnn.loss, cnn.sig_scores],
+                        feed_dict)
+                    one_hot_scores = data_helpers.to_one_hot_scores(sig_scores, FLAGS.multilabel_threshold)
+                    subset_acc = accuracy_score(one_hot_scores, y_batch)
+                    ham_loss = hamming_loss(one_hot_scores, y_batch)
+                    time_str = datetime.datetime.now().isoformat()
+                    print("{}: step {}, loss {:g}, ham {:g}, sub_acc {:g}".format(time_str, step,
+                                                                                  loss, ham_loss, subset_acc))
+                    if writer:
+                        writer.add_summary(summaries, step)
+                    return subset_acc
 
             # Generate batches
             batches = data_helpers.batch_iter(
@@ -257,71 +276,81 @@ def test_unit(x_train, y_train, vocab_size, max_len,word_embedding, sr_word2id):
         word_embedding=word_embedding,
         filter_sizes=list(map(int, FLAGS.filter_sizes.split(","))),
         num_filters=FLAGS.num_filters,
+        if_one_entity=FLAGS.if_one_entity,
         l2_reg_lambda=FLAGS.l2_reg_lambda)
 
     # for fsm_v2
     print("sequence_length=x_train.shape[1]", x_train.shape[1])
     print("num_classes=y_train.shape[1]", y_train.shape[1])
 
-    model_path = "runs_bandian/1554965249/checkpoints/"
+    model_path = "runs_bandian/1571543056/checkpoints/"
     model_file = tf.train.latest_checkpoint(model_path)
     saver = tf.train.Saver()
     saver.restore(sess, model_file)
 
     # for more
     df_domain_test = pd.read_csv("../resources/test_data/test_classification.csv")
-    x_domian = data_helpers.load_data_and_labels_for_test(df_domain_test, max_len,sr_word2id)
+    x_domian = data_helpers.load_data_and_labels_for_test(df_domain_test, max_len, sr_word2id)
     x_domian = np.array(x_domian)
-
 
     feed_dict = {
         cnn.input_x: x_domian,
         cnn.dropout_keep_prob: 1.0
     }
-    test_sig_scores, scores= sess.run([cnn.sig_scores, cnn.scores], feed_dict)
-    # test_sig_scores = test_sig_scores[0]
-    # scores = scores
-    print(test_sig_scores)
-    print(scores)
-    print()
-    one_hot_scores = data_helpers.to_one_hot_scores(test_sig_scores, FLAGS.multilabel_threshold)
-    print("ppp")
 
-    with open('../resources/test_data/test_result.csv', 'wt') as f:
-        for i in range(len(df_domain_test)):
-            f.write(df_domain_test["user_q"][i])
-            f.write("\t")
-            f.write(str(df_domain_test["class_label"][i]))
-            f.write("\t")
-            print(one_hot_scores[i])
-            print(test_sig_scores[i])
-            print(scores[i])
-            print()
-            # s = [j for j in range(len(one_hot_scores[i])) if one_hot_scores[i][j] == 1]
-            s = []
-            if 1 not in one_hot_scores[i]:
-                if scores[i][0] > scores[i][1]:
-                    max1, max2 = scores[i][0], scores[i][1]
-                    max1_j, max2_j = 0, 1
+    if FLAGS.if_one_entity:
+        test_pred = sess.run([cnn.predictions], feed_dict)
+        pred_class = test_pred[0]
+
+        with open('../resources/test_data/test_result.csv', 'wt') as f:
+            for i in range(len(df_domain_test)):
+                f.write(df_domain_test["user_q"][i])
+                f.write("\t")
+                f.write(str(df_domain_test["class_label"][i]))
+                f.write("\t")
+                f.write(str(pred_class[i]))
+                f.write("\n")
+
+    else:
+        test_sig_scores, scores= sess.run([cnn.sig_scores, cnn.scores], feed_dict)
+        one_hot_scores = data_helpers.to_one_hot_scores(test_sig_scores, FLAGS.multilabel_threshold)
+        with open('../resources/test_data/test_result.csv', 'wt') as f:
+            for i in range(len(df_domain_test)):
+                f.write(df_domain_test["user_q"][i])
+                f.write("\t")
+                f.write(str(df_domain_test["class_label"][i]))
+                f.write("\t")
+                print(one_hot_scores[i])
+                print(test_sig_scores[i])
+                print(scores[i])
+                print()
+                # s = [j for j in range(len(one_hot_scores[i])) if one_hot_scores[i][j] == 1]
+                s = []
+                if 1 not in one_hot_scores[i]:
+                    if scores[i][0] > scores[i][1]:
+                        max1, max2 = scores[i][0], scores[i][1]
+                        max1_j, max2_j = 0, 1
+                    else:
+                        max1, max2 = scores[i][1], scores[i][0]
+                        max1_j, max2_j = 1, 0
+                    for j in range(2, len(scores[i])):
+                        if scores[i][j] > max1:
+                            max2, max2_j = max1, max1_j
+                            max1, max1_j = scores[i][j], j
+                        elif max2 < scores[i][j] <= max1:
+                            max2, max2_j = scores[i][j], j
+
+                    s.append(max1_j)
+                    s.append(max2_j)
                 else:
-                    max1, max2 = scores[i][1], scores[i][0]
-                    max1_j, max2_j = 1, 0
-                for j in range(2, len(scores[i])):
-                    if scores[i][j] > max1:
-                        max2, max2_j = max1, max1_j
-                        max1, max1_j = scores[i][j], j
-                    elif max2 < scores[i][j] <= max1:
-                        max2, max2_j = scores[i][j], j
+                    for j in range(len(one_hot_scores[i])):
+                        if one_hot_scores[i][j] == 1:
+                            s.append(j)
 
-                s.append(max1_j)
-                s.append(max2_j)
-            else:
-                for j in range(len(one_hot_scores[i])):
-                    if one_hot_scores[i][j] == 1:
-                        s.append(j)
+                f.write(str(s))
+                f.write("\n")
 
-            f.write(str(s))
-            f.write("\n")
+
 
 
 def cv_test(x, y, vocab_size,word_embedding):
@@ -357,8 +386,8 @@ def main(argv=None):
     x, y, vocab_size, max_len,word_embedding, sr_word2id= preprocess()
     # x, y, vocab_processor = preprocess()
     # cv_test(x, y, vocab_processor)
-    one_time_train_test(x, y, vocab_size, word_embedding)
-    # test_unit(x, y, vocab_size,max_len,word_embedding, sr_word2id)
+    # one_time_train_test(x, y, vocab_size, word_embedding)
+    test_unit(x, y, vocab_size,max_len,word_embedding, sr_word2id)
 
 
 if __name__ == '__main__':

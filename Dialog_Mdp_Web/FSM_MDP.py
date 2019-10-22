@@ -5,6 +5,7 @@ import DM
 
 kg = KG.KG()
 tree = kg.build_tree()
+tree.show()
 nlu = NLU.NLU()
 nlg = NLG.NLG()
 dm = DM.DM()
@@ -42,7 +43,7 @@ class FSM:
                     return 1, state_mdp,state_array,state_linklist
 
         # 没有if_type的 进行反问
-        io_method.out_fun("请问您属于 居民 or 非居民：")
+        io_method.out_fun("请问您属于 居民还是非居民：")
         rhetoric_list = [tree.get_node(id) for id in jumin_id]
         user_ans_id = nlu.get_rhetoric_ans(io_method, rhetoric_list)
 
@@ -77,7 +78,7 @@ class FSM:
 
     def basic_question(self, io_method, intent_array, state_array, state_linklist):
         # 加上这部分对v2也不需要改什么～
-        io_method.out_fun("您好，请问您属于低压 or 高压")
+        io_method.out_fun("您好，请问您属于低压还是高压")
         user_ans_id = self.basic_rhetoric(io_method, dianya_id)
         ids = [user_ans_id]
         assert len(ids) == 1
@@ -87,7 +88,7 @@ class FSM:
         state_linklist.append(ids[0])
 
         if tree.get_node(ids[0]).tag == "低压":
-            io_method.out_fun("您好，请问您属于居民 or 非居民")
+            io_method.out_fun("您好，请问您属于居民还是非居民")
             user_ans_id = self.basic_rhetoric(io_method, jumin_id)
             ids = [user_ans_id]
             assert len(ids) == 1
