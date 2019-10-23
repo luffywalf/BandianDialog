@@ -31,9 +31,12 @@ http://www.95598.cn/static/html//person/sas//PM06001003_997.shtml
    
    
 #### 树状图谱（部分）
-
+![image](https://github.com/luffywalf/BandianDialog/blob/master/picture/kg_example.png)
 
 #### 网页端样例
+![image](https://github.com/luffywalf/BandianDialog/blob/master/picture/dialog_1.png)
+![image](https://github.com/luffywalf/BandianDialog/blob/master/picture/dialog_2.png)
+![image](https://github.com/luffywalf/BandianDialog/blob/master/picture/dialog_3.png)
 
 
 
