@@ -44,11 +44,12 @@ class NLG:
     def rhetoric_generator(self, io_method, tree, nid, ids):
         # 消歧反问的句子生成规则
         children_list = tree.children(nid)
-        io_method.out_fun("请问您属于：")#11
+        children_list_for_out = []
         for i in range(len(children_list)):
             and_set = set([x for x in tree.subtree(children_list[i].identifier).nodes]) & set(ids)
             if and_set:
-                io_method.out_fun(children_list[i].tag)#11
+                children_list_for_out.append(children_list[i])
+        self.generate_answer(io_method, 11, children_list=children_list_for_out)
         return children_list
 
     def answer_for_user(self, io_method, tree, nid, state_array, state_linklist):
@@ -58,9 +59,7 @@ class NLG:
         ans_other = []
 
         children_list = tree.children(nid)
-        io_method.out_fun("您需要：")#12
-        for i in range(len(children_list)):
-            io_method.out_fun(children_list[i].tag)#12
+        self.generate_answer(io_method, 12, children_list=children_list)
 
         parent = tree.parent(nid)
         if not parent.is_root and parent:
@@ -82,15 +81,17 @@ class NLG:
                         ans_other.append(a)
 
             if ans_other:
-                io_method.out_fun("除此之外，您还需要:")#13
-                for a in ans_other:
-                    io_method.out_fun(a.tag)#13
+                self.generate_answer(io_method, 13, children_list=ans_other)
+                # io_method.out_fun("除此之外，您还需要:")#13
+                # for a in ans_other:
+                #     io_method.out_fun(a.tag)#13
 
         return state_array, state_linklist
 
     def que_set(self, io_method, s_a_i, i, children_list, state_array, state_linklist):
         if s_a_i == 0:  # ( ==2 or 3) 不该有1的情况了 因为应该已经消歧过了
-            io_method.out_fun("您属于 "+children_list[i].tag+" 吗")#14
+            #io_method.out_fun("您属于 "+children_list[i].tag+" 吗")#14
+            self.generate_answer(io_method, 14, curr_node=children_list[i])
             x_input = io_method.in_fun()
             if self.check_if_no(x_input):  # 0 不属于
                 s_a_i = 3
@@ -128,7 +129,7 @@ class NLG:
                     for n in tree.children(children_list[i].identifier):
                         ans_node.append(n)
             elif children_list[i].tag in self.if_two_set:
-                s_a_i = self.que_set(io_method, s_a_i, i, children_list,state_array, state_linklist)
+                s_a_i = self.que_set(io_method, s_a_i, i, children_list, state_array, state_linklist)
                 # 租赁 不管有没有租赁 此节点都加上
                 ans_node.append(tree.parent(children_list[i].identifier))
                 if s_a_i == 2:
@@ -146,12 +147,12 @@ class NLG:
             ans_node, state_array, state_linklist = self.answer_for_stuff(io_method, tree, nid, state_array, state_linklist)
             # 叶节点
             if not ans_node:
-                io_method.out_fun("抱歉，超出我的知识范围啦～") #15
+                self.generate_answer(io_method, 15)
                 return
-
-            io_method.out_fun(tree.get_node(nid).tag+"包括：") #16
-            for n in ans_node:
-                io_method.out_fun(n.tag)
+            self.generate_answer(io_method, 16, curr_node=tree.get_node(nid), children_list=ans_node)
+            # io_method.out_fun(tree.get_node(nid).tag+"包括：") #16
+            # for n in ans_node:
+            #     io_method.out_fun(n.tag)
 
         else:
             # 用户类, 不会出现问到叶节点的情况
@@ -160,6 +161,24 @@ class NLG:
         return state_array, state_linklist
 
     def generate_answer(self, io_method, id, curr_node=None, children_list=None):
-        io_method.io_method.out_fun(self.nlg_answer_array[id])
+        if not curr_node and not children_list:
+            io_method.out_fun(self.nlg_answer_array[id])
+        elif curr_node and children_list:
+            #16
+            io_method.out_fun(curr_node.tag + self.nlg_answer_array[id])
+            for n in children_list:
+                io_method.out_fun(n.tag)
+        elif curr_node:
+            # 14,7
+            io_method.out_fun(self.nlg_answer_array[id] + curr_node.tag)
+        else:
+            #11 12 13
+            ans = self.nlg_answer_array[id]
+            io_method.out_fun()
+            for n in children_list:
+                ans += n.tag
+
+
+
 
 

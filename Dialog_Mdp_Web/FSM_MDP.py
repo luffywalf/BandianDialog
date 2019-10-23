@@ -44,13 +44,12 @@ class FSM:
                     return 1, state_mdp,state_array,state_linklist
 
         # 没有if_type的 进行反问
-        #nlg.generate_answer(io_method, 0)
-        io_method.out_fun("请问您属于居民还是非居民：") #0
+        nlg.generate_answer(io_method, 0)
         rhetoric_list = [tree.get_node(id) for id in jumin_id]
         user_ans_id = nlu.get_rhetoric_ans(io_method, rhetoric_list)
 
         while user_ans_id == -1:
-            io_method.out_fun("请回答上面列出的选项: ") #1
+            nlg.generate_answer(io_method, 1) #1
             user_ans_id = nlu.get_rhetoric_ans(io_method, rhetoric_list)
 
         # if nlg.check_if_no(x_input):
@@ -74,13 +73,13 @@ class FSM:
         rhetoric_list = [tree.get_node(id) for id in rhetoric_id]
         user_ans_id = nlu.get_rhetoric_ans(io_method, rhetoric_list)
         while user_ans_id == -1:
-            io_method.out_fun("请回答上面列出的选项: ") #1
+            nlg.generate_answer(io_method, 1) #1
             user_ans_id = nlu.get_rhetoric_ans(io_method, rhetoric_list)
         return user_ans_id
 
     def basic_question(self, io_method, intent_array, state_array, state_linklist):
         # 加上这部分对v2也不需要改什么～
-        io_method.out_fun("您好，请问您属于低压还是高压") #2
+        nlg.generate_answer(io_method, 2) #2
         user_ans_id = self.basic_rhetoric(io_method, dianya_id)
         ids = [user_ans_id]
         assert len(ids) == 1
@@ -90,7 +89,7 @@ class FSM:
         state_linklist.append(ids[0])
 
         if tree.get_node(ids[0]).tag == "低压":
-            io_method.out_fun("您好，请问您属于居民还是非居民") # 0
+            nlg.generate_answer(io_method, 0) # 0
             user_ans_id = self.basic_rhetoric(io_method, jumin_id)
             ids = [user_ans_id]
             assert len(ids) == 1
@@ -185,11 +184,9 @@ class FSM:
         return state_mdp,state_array,state_linklist
 
     def dm_nlg_step(self, io_method, mapped_class_name, ids, intent_array, state_array, state_linklist, if_class, disambiguation_node_dict):
-        print("1:", ids)
         # 反悔信息
         if_class, ids, state_array, state_linklist = self.check_go_back_word(mapped_class_name, if_class, ids,
                                                                     intent_array, state_array,state_linklist, disambiguation_node_dict)
-        print("2:", ids)
         # 当反悔但没有歧义点时 走这里；这里就不涉及到intent_array
         ids_len_0_flag = 0
         if len(ids) == 0:
@@ -197,7 +194,8 @@ class FSM:
                 if s == 2:
                     entity_node_id_now = i
                     ids_len_0_flag = 1
-            io_method.out_fun("好的，您还有什么问题") # 3
+
+            nlg.generate_answer(io_method, 3) # 3
         if ids_len_0_flag:
             return ids, intent_array, state_array, state_linklist
 
@@ -217,27 +215,27 @@ class FSM:
 
         # {"greeting": 0, "end": 1, "up_yes": 2, "up_no": 3, "up_q": 4, "down_disa": 5, "down_ans": 6}
         if action_num == 0:
-            io_method.out_fun("你好") # 4
+            nlg.generate_answer(io_method, 4) # 4
         elif action_num == 1:
             self.break_flag = 1
             return ids, intent_array, state_array, state_linklist
         elif action_num == 2:
-            io_method.out_fun("那么您需要带～") #5
+            nlg.generate_answer(io_method, 5) #5
             return ids, intent_array, state_array, state_linklist
         elif action_num == 3:
-            io_method.out_fun("不需要") #6
+            nlg.generate_answer(io_method, 6) #6
             return ids, intent_array, state_array, state_linklist
         elif action_num == 4:
             parent = tree.parent(entity_node_id_now)
-            io_method.out_fun("请问您是否属于"+parent.tag) #7
+            nlg.generate_answer(io_method, 7, curr_node=parent) #7
             x_input = io_method.in_fun()
             if not nlg.check_if_no(x_input):
                 intent_array[parent.identifier] = if_class
                 state_array[parent.identifier] = 2
                 state_linklist.append(parent.identifier)
-                io_method.out_fun("您需要带")#8
+                nlg.generate_answer(io_method, 8)#8
             else:
-                io_method.out_fun("不需要")#6
+                nlg.generate_answer(io_method, 9)#6
             return ids, intent_array, state_array, state_linklist
         elif action_num == 5:
             # 假设相同的mapped_class_name对应的ids是相同的；其实
@@ -271,7 +269,7 @@ class FSM:
 
         self.break_flag = 0
         self.epoch_length = epoch_length
-        io_method.out_fun("您有什么问题")#9
+        nlg.generate_answer(io_method, 9)#9
         while self.epoch_length:
 
             input_x = io_method.in_fun()
@@ -325,8 +323,7 @@ class FSM:
 
             # UNK
             if len(ids) == 1 and ids[0] == 0:
-                nlg.generate_answer(10)
-                io_method.out_fun("您所说的我不太懂 请换个问题吧")#10
+                nlg.generate_answer(io_method, 10)#10
                 continue
 
             ids, intent_array, state_array, state_linklist = self.dm_nlg_step(io_method, mapped_class_name, ids,
