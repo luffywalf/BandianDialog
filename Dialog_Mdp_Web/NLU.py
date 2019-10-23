@@ -248,9 +248,6 @@ class NLU:
         for i in range(len(df_ele)):
             if df_ele["class_id"][i] in pred_class:
                 if df_ele["class_name"][i] not in pred_class_str:
-                    print("ppp")
-                    print(df_ele["class_name"][i])
-                    print(pred_class_str)
                     pred_class_str.append(df_ele["class_name"][i])
 
         print("mapped result:", pred_class_str, pred_class,pred_class_intent)

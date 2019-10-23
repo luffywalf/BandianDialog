@@ -34,6 +34,15 @@ class NLG:
         for i in range(len(df_nlg_answer)):
             self.nlg_answer_array.append(df_nlg_answer["sentence"][i])
 
+        self.rel_dict = {}
+        self.bandian_rel_path = "src/data/bandian_rel.csv"
+        df_del = pd.read_csv(self.bandian_rel_path)
+        for i in range(len(df_del)):
+            from_id, to_id, rel = df_del["from_id"][i], df_del["to_id"][i], df_del["rel"][i]
+            if (from_id, to_id) in self.rel_dict:
+                print("load rel_dict error...")
+            self.rel_dict[(from_id, to_id)] = rel
+
     def check_if_no(self, sent):
         # TODO 可能还不够完善？
         for x in self.no_set:
@@ -164,10 +173,27 @@ class NLG:
         if not curr_node and not children_list:
             io_method.out_fun(self.nlg_answer_array[id])
         elif curr_node and children_list:
-            #16
-            io_method.out_fun(curr_node.tag + self.nlg_answer_array[id])
-            for n in children_list:
-                io_method.out_fun(n.tag)
+            #16 查一下边的信息 - 只有包括-16这一种才需要查边信息 因为我只要看是否为next
+
+            ans = ""
+            for i, node in enumerate(children_list):
+                rel = (curr_node.identifier, node.identifier)
+                if rel in self.rel_dict:
+                    if self.rel_dict[rel] == "pro":
+                        if node.tag == "材料":
+                            ans += curr_node.tag + "是需要您携带相关材料，进行办电的申请。"
+                        else:
+                            ans += curr_node.tag + "是指" + node.tag + "。"
+
+                    elif self.rel_dict[rel] == "next":
+                        ans += "然后下一步的流程是"+node.tag
+                    else:
+                        if i == 0:
+                            ans += curr_node.tag + self.nlg_answer_array[id] + node.tag
+                        else:
+                            ans += "," + node.tag
+
+            io_method.out_fun(ans)
         elif curr_node:
             # 14,7
             io_method.out_fun(self.nlg_answer_array[id] + curr_node.tag)

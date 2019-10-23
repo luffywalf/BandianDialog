@@ -100,3 +100,8 @@ data/processor.vocab
 房屋产权证明包括：
 房屋产权证明
 租赁协议复印件及产权人同意报装证明材料
+
+2.每句话都有一个 load_data_and_labels_done...
+
+3. inc 或 ne 与？ 这个先不管
+4. 将为您装表接电 - 应该加个结束语

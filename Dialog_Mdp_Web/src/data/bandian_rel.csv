@@ -14,7 +14,7 @@ from_id,to_id,rel
 6,14,ne
 6,15,if
 15,16,ne
-6,17,next
+5,17,next
 2,18,inc
 18,19,pro
 19,20,ne
