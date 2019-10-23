@@ -87,35 +87,6 @@ cnn-intent-classification/runs_bandian/1544259188/checkpoints
 data/processor.vocab
 
 
-requirment.txt
-
-kg
-from treelib import Tree, Node
-import numpy as np
-import copy
-import pandas as pd
-
-web
-from __future__ import print_function
-from __future__ import absolute_import
-import sys
-import argparse
-
-data_helpers
-import numpy as np
-import re
-import jieba
-import pandas as pd
-from gensim.models import KeyedVectors
-
-NLU
-import tensorflow as tf
-import pandas as pd
-from tensorflow.contrib import learn
-import jieba
-import numpy as np
-import time
-
 问题
 0. NLU部分不准确
 

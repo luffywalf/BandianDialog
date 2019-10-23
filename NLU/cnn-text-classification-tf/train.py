@@ -3,12 +3,10 @@
 
 import tensorflow as tf
 import numpy as np
-import os
 import time
 import datetime
 import data_helpers
 from text_cnn import TextCNN
-from tensorflow.contrib import learn
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score,hamming_loss, label_ranking_average_precision_score

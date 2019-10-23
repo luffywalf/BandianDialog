@@ -13,7 +13,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score
 from sklearn.model_selection import KFold
-from pycm import *
+#from pycm import *
 
 # Parameters
 # ==================================================
@@ -309,59 +309,6 @@ def one_time_train_test(x, y, vocab_processor):
 
     print(test(cnn, sess, x_train, y_train, x_test, y_test, vocab_processor))
 
-    # print("my own test data")
-    # # use_my_own_test_data
-    # df_test = pd.read_csv("../resources/database/make_up_test_data.csv")
-    # x_test, _ = data_helpers.load_data_and_labels(df_test)
-    # x_test = np.array(list(vocab_processor.fit_transform(x_test)))
-    # y = df_test["class_label"]
-    # y = np.array(y)
-    #
-    # y_test = np.zeros((len(y), 60))
-    # y_test[np.arange(len(y)), y] = 1
-    #
-    #
-    # feed_dict = {
-    #     # may not work x_batch; do work cause (None,1)
-    #     cnn.input_x: x_test,
-    #     cnn.input_y: y_test,
-    #     cnn.dropout_keep_prob: 1.0
-    # }
-    # test_scores, test_pred, test_p3 = sess.run([cnn.scores, cnn.predictions, cnn.predictions3],feed_dict)
-    # # test_pred = sess.run([cnn.predictions], feed_dict)
-    # print("test_scores")
-    # for i in test_scores:
-    #     print(i)
-    # print("p:", test_pred)
-    # test_p3 = test_p3.indices
-    #
-    # # test_pred = test_pred[0]
-    # # test_pred += 1
-    #
-    # print("test_pred:", test_pred)
-    # print("y", y)
-    #
-    # pre = precision_score(y, test_pred, average='macro')
-    # recall = recall_score(y, test_pred, average='macro')
-    # acc = accuracy_score(y, test_pred)
-    # f1 = f1_score(y, test_pred, average='macro')
-    #
-    # print("pre, recall, acc, f1:", pre, recall, acc, f1)
-    #
-    # p3 = []
-    # for i, p in enumerate(test_p3):
-    #     if y[i] in (p):
-    #         p3.append(1)
-    #     else:
-    #         p3.append(0)
-    # print(p3)
-    #
-    # print("three acc:", sum(p3) / len(p3))
-    #
-    # cm = ConfusionMatrix(actual_vector=y, predict_vector=test_pred)
-    # cm.save_obj("../resources/cm_bandian_own_test")
-    #
-    # print(test_p3)
 
 
 def main(argv=None):

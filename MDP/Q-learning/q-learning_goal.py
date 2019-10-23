@@ -1,9 +1,8 @@
 import numpy as np
 import pandas as pd
 import itertools
-import random
 import us_goal
-import draw
+#import draw
 import copy
 
 us = us_goal.UserSimulator()
@@ -36,42 +35,6 @@ class Train():
         self.actNum = 7
         self.Q = np.zeros([self.stateNum, self.actNum])
         self.DISCOUNT_FACTOR = 0.9
-
-    # def precision_for_seven_right(self):
-    #     for r in range(len(self.Q)):
-    #         for j in range(len(self.Q[r])):
-    #             self.Q[r][j] = int(self.Q[r][j])
-    #
-    #     pos = 0
-    #     for k, v in right_dict.items():
-    #         if np.argmax(self.Q[k]) == v:
-    #             pos += 1
-    #     return pos/len(right_dict)
-
-
-    # def precision(self):
-    #     for r in range(len(self.Q)):
-    #         for j in range(len(self.Q[r])):
-    #             self.Q[r][j] = int(self.Q[r][j])
-    #
-    #     res = []
-    #
-    #     for i in range(len(self.Q)):
-    #         # if max(self.Q[i]) != 0:
-    #         res.append((i,np.argmax(self.Q[i])))
-    #
-    #     pos = 0
-    #     all = 0
-    #     for r in res:
-    #         if r[0] in right_dict:
-    #             if r[1] == right_dict[r[0]]:
-    #                 pos += 1
-    #             all += 1
-    #     print(self.Q)
-    #     print(pos)
-    #     print(all)
-    #
-    #     return pos / all
 
     def state_2_statenum(self, state):
         # state [0,0,1]  = 0*5^2 + 0*4^1 + 1*2^0 = 1
@@ -180,7 +143,7 @@ class Train():
             reward_log_epi_list.append(reward_log_turn_list[:])
             # for end
 
-        draw.process(metrics_pre)
+        #draw.process(metrics_pre)
 
 
         np.save('../data/Q_Table.npy', self.Q)
