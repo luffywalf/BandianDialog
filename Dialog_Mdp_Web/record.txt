@@ -7,7 +7,6 @@
 2.分别run NLU下的两个分类模型得到模型文件 写入相应位置；得到intent的vocab文件 写入相应位置
 3.run Q-learning得到Q表
 
-还有环境配置install的那些还没弄 
 2019/10/19
 我跑了下intent模型没问题 text没跑 跑了Q-learning 应该没什么问题 先改逻辑和NLG吧
 2019/10/20

@@ -173,10 +173,10 @@ class NLG:
             io_method.out_fun(self.nlg_answer_array[id] + curr_node.tag)
         else:
             #11 12 13
-            ans = self.nlg_answer_array[id]
-            io_method.out_fun()
+            io_method.out_fun(self.nlg_answer_array[id])
             for n in children_list:
-                ans += n.tag
+                io_method.out_fun(n.tag)
+
 
 
 
