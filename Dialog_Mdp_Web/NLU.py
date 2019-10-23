@@ -176,7 +176,7 @@ class NLU:
             user_ans_id = self.get_rhetoric_ans(io_method, children_list)
 
             while user_ans_id == -1:
-                io_method.out_fun("请回答上面列出的选项: ")
+                io_method.out_fun("请回答上面列出的选项: ")#1
                 user_ans_id = self.get_rhetoric_ans(io_method, children_list)
 
             next_id = user_ans_id

@@ -15,7 +15,7 @@ kg = KG.KG()
 tree = kg.build_tree()
 fsm = FSM_MDP.FSM()
 
-class IO_method():
+class IO:
     def __init__(self, if_web, client):
         self.if_web = if_web
         self.client = client
@@ -35,7 +35,7 @@ class IO_method():
 
 
 def chat(client, uid):
-    io_method = IO_method(if_web, client)
+    io_method = IO(if_web, client)
     fsm.process(io_method, intent_array, state_array, state_linklist, disambiguation_node_dict, 20)
 
 
@@ -56,7 +56,7 @@ if __name__ == '__main__':
         print(opt)
         run(chat, opt.mode, opt.title, opt.web_port, opt.log_dir, opt.local_prompt)
     else:
-        io_method = IO_method(if_web, None)
+        io_method = IO(if_web, None)
         fsm.process(io_method, intent_array, state_array, state_linklist, disambiguation_node_dict, 20)
 
 

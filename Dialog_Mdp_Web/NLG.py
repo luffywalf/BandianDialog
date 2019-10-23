@@ -1,9 +1,10 @@
 import KG
+import pandas as pd
 kg = KG.KG()
 tree = kg.build_tree()
 
-
 class NLG:
+    nlg_answer_path = "src/data/nlg.csv"
     basic_user_info_set = {"低压", "高压", "居民", "非居民"}
     mutex_set = {"军队", "企业", "企业或工商客户", "机关事业单位或其他非营利组织", "机关事业单位"}
     mutex_set_id = set()
@@ -27,6 +28,12 @@ class NLG:
                     "建设工程规划许可证及附件"}
     no_set = {"不", "非", "否"}
 
+    def __init__(self):
+        self.nlg_answer_array = []
+        df_nlg_answer = pd.read_csv(self.nlg_answer_path)
+        for i in range(len(df_nlg_answer)):
+            self.nlg_answer_array.append(df_nlg_answer["sentence"][i])
+
     def check_if_no(self, sent):
         # TODO 可能还不够完善？
         for x in self.no_set:
@@ -37,11 +44,11 @@ class NLG:
     def rhetoric_generator(self, io_method, tree, nid, ids):
         # 消歧反问的句子生成规则
         children_list = tree.children(nid)
-        io_method.out_fun("请问您属于：")
+        io_method.out_fun("请问您属于：")#11
         for i in range(len(children_list)):
             and_set = set([x for x in tree.subtree(children_list[i].identifier).nodes]) & set(ids)
             if and_set:
-                io_method.out_fun(children_list[i].tag)
+                io_method.out_fun(children_list[i].tag)#11
         return children_list
 
     def answer_for_user(self, io_method, tree, nid, state_array, state_linklist):
@@ -51,9 +58,9 @@ class NLG:
         ans_other = []
 
         children_list = tree.children(nid)
-        io_method.out_fun("您需要：")
+        io_method.out_fun("您需要：")#12
         for i in range(len(children_list)):
-            io_method.out_fun(children_list[i].tag)
+            io_method.out_fun(children_list[i].tag)#12
 
         parent = tree.parent(nid)
         if not parent.is_root and parent:
@@ -75,15 +82,15 @@ class NLG:
                         ans_other.append(a)
 
             if ans_other:
-                io_method.out_fun("除此之外，您还需要:")
+                io_method.out_fun("除此之外，您还需要:")#13
                 for a in ans_other:
-                    io_method.out_fun(a.tag)
+                    io_method.out_fun(a.tag)#13
 
         return state_array, state_linklist
 
     def que_set(self, io_method, s_a_i, i, children_list, state_array, state_linklist):
         if s_a_i == 0:  # ( ==2 or 3) 不该有1的情况了 因为应该已经消歧过了
-            io_method.out_fun("您属于 "+children_list[i].tag+" 吗")
+            io_method.out_fun("您属于 "+children_list[i].tag+" 吗")#14
             x_input = io_method.in_fun()
             if self.check_if_no(x_input):  # 0 不属于
                 s_a_i = 3
@@ -135,23 +142,24 @@ class NLG:
 
     def answer_generator_for_include(self, io_method, tree, nid, state_array, state_linklist):
         if not tree.get_node(nid).tag in self.user_set:
-            print("material class")
             # 材料类
             ans_node, state_array, state_linklist = self.answer_for_stuff(io_method, tree, nid, state_array, state_linklist)
             # 叶节点
             if not ans_node:
-                io_method.out_fun("抱歉，超出我的知识范围啦～")
+                io_method.out_fun("抱歉，超出我的知识范围啦～") #15
                 return
 
-            io_method.out_fun(tree.get_node(nid).tag+"包括：")
+            io_method.out_fun(tree.get_node(nid).tag+"包括：") #16
             for n in ans_node:
                 io_method.out_fun(n.tag)
 
         else:
-            print("user class")
             # 用户类, 不会出现问到叶节点的情况
             state_array, state_linklist = self.answer_for_user(io_method, tree, nid, state_array, state_linklist)
 
         return state_array, state_linklist
+
+    def generate_answer(self, io_method, id, curr_node=None, children_list=None):
+        io_method.io_method.out_fun(self.nlg_answer_array[id])
 
 
