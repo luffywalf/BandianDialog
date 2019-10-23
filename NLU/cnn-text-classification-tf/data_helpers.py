@@ -8,6 +8,7 @@ from gensim.models import KeyedVectors
 import pickle as pkl
 import time
 
+w2v_path = "../../Dialog_Mdp_Web/src/emb/some_w2v"
 word2id_pkl_path = "/Users/dingning/Ding/Python/VE/BUPT/DialogKB/NLU/cnn-text-classification-tf/PKL/sgns.chinese/word2id.pkl"
 word_emb_path = "/Users/dingning/Ding/Python/VE/BUPT/DialogKB/NLU/cnn-text-classification-tf/PKL/sgns.chinese/word_embedding.npy"
 
@@ -37,7 +38,7 @@ def build_glove_dic():
     # print("2:")
 
     # 下面如果load如果加了编码参数会有编码问题
-    model = KeyedVectors.load_word2vec_format("/home/dn/WordEmbedding/sgns.merge.word")
+    model = KeyedVectors.load_word2vec_format(w2v_path)
     vocab = model.vocab
     # print(model.similarity('我', '你'))
     # print(model.similarity('时间', '明天'))
@@ -248,9 +249,9 @@ def load_data_and_labels_one_entity(df):
 
     print("start load_data_and_labels...")
     t1 = time.time()
-    # sr_word2id, word_embedding = build_glove_dic()
-    sr_word2id = pd.read_pickle(word2id_pkl_path)
-    word_embedding = np.load(word_emb_path)
+    sr_word2id, word_embedding = build_glove_dic()
+    # sr_word2id = pd.read_pickle(word2id_pkl_path)
+    # word_embedding = np.load(word_emb_path)
     t2 = time.time()
     print("Vocabulary Size: {:d}".format(len(sr_word2id)))
     print("load emd use time:", t2 - t1)

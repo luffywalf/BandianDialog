@@ -45,7 +45,7 @@ if __name__ == '__main__':
     array_len = tree.size()+1  # 因为多了一个不在树中的unk
     state_array, intent_array = [0] * array_len, [0] * array_len
     state_linklist, disambiguation_node_dict = [], {}
-    if_web = False  # if you are in debug mode, set False
+    if_web = True  # if you are in debug mode, set False
     if if_web:
         parser = argparse.ArgumentParser()
         parser.add_argument('-mode', default='web')
