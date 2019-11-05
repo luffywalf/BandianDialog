@@ -44,6 +44,7 @@ FLAGS = tf.flags.FLAGS
 def preprocess():
     # Data Preparation
     # ==================================================
+    # to get vocab
     df_bandian_pos = pd.read_csv("../resources/database/bandian_q_pos.csv")
     df_bandian_neg = pd.read_csv("../resources/database/bandian_q_neg.csv")
     df_bandian = pd.concat([df_bandian_pos, df_bandian_neg])
@@ -65,11 +66,8 @@ def preprocess():
 
     x_intent = np.array(list(vocab_processor.transform(x_text_intent)))
 
-    # only neg data is random, so below
-    x, x_dev, y, y_dev = train_test_split(x_intent, y_intent, test_size=0, random_state=42)
+    return x_intent, y_intent, vocab_processor
 
-    return x, y,vocab_processor
-    # return x, y, vocab_size, max_len
 
 
 def train(x_train, y_train, vocab_processor, x_dev, y_dev):

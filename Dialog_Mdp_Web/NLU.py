@@ -46,7 +46,7 @@ class NLU:
         self.word_emb_path = "/Users/dingning/Ding/Python/VE/BUPT/DialogKB/NLU/cnn-text-classification-tf/PKL/sgns.chinese/word_embedding.npy"
         self.text_model_path = "/Users/dingning/Ding/Python/VE/BUPT/DialogKB/Bandian_Dialog/NLU/cnn-text-classification-tf/runs_bandian/1571543056/checkpoints"
         self.intent_vocab_pro = "src/generate/processor.vocab"
-        self.intent_model_path = "/Users/dingning/Ding/Python/VE/BUPT/DialogKB/NLU/cnn-intent-classification/runs_bandian/1544259188/checkpoints"
+        self.intent_model_path = "/Users/didi/PycharmProjects/Bupt/BandianDialog/NLU/cnn-intent-classification/runs_bandian/1572924359/checkpoints"
         self.bandian_node = "/Users/dingning/Ding/Python/VE/BUPT/DialogKB/NLU/resources/database/node_bandian_q_pos.csv"
 
         self.sr_word2id = pd.read_pickle(self.word2id_pkl_path)
