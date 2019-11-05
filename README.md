@@ -12,11 +12,11 @@ http://www.95598.cn/static/html//person/sas//PM06001003_997.shtml
 
 ##### 如何运行
 1. 环境安装 python==3.6 以及 其他安装包见 requirements.txt (pip install -r requirements)
-2. 进入MDP文件夹，执行 python q-learning_goal.py  
+2. 进入MDP/Q-learning/文件夹，执行 python q-learning_goal.py  
    得到 MDP/data/Q_Table.npy 并放入 Dialog_Mdp_Web/src/generate/ （现在是已经放好的）
 3. 进入NLU文件夹
    * 对于cnn-intent-classfication
-     * 直接运行train.py 得到模型文件和词表文件
+     * 直接运行train.py 得到模型文件(cnn-intent-classification/data/runs_bandian/../checkpoints)和词表文件(在cnn-intent-classification/data/processor.vocab)
      * 将模型文件放到Dialog_Mdp_Web/NLU.py的self.intent_model_path 和 self.intent_vocab_pro
    * 对于cnn-text-classfication
      * 首先 下载自己想用的词向量（默认300维）到 Dialog_Mdp_Web/src/emb
