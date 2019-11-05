@@ -11,7 +11,7 @@ http://www.95598.cn/static/html//person/sas//PM06001003_997.shtml
 ##### 系统介绍 - 我的中期预答辩PPT   
 
 ##### 如何运行
-1. 环境安装 python==3.6 以及 其他安装包见 requirements.txt (pip install requirements)
+1. 环境安装 python==3.6 以及 其他安装包见 requirements.txt (pip install -r requirements)
 2. 进入MDP文件夹，执行 python q-learning_goal.py  
    得到 MDP/data/Q_Table.npy 并放入 Dialog_Mdp_Web/src/generate/ （现在是已经放好的）
 3. 进入NLU文件夹
