@@ -21,7 +21,7 @@ http://www.95598.cn/static/html//person/sas//PM06001003_997.shtml
    * 对于cnn-text-classfication
      * 首先 下载自己想用的词向量（默认300维）到 Dialog_Mdp_Web/src/emb
      * 更改NLU/cnn-text-classification-tf/data_helpers.py 中的w2v_path 为Dialog_Mdp_Web/src/emb/某词向量
-       非首次运行train.py的话 可以把data_helpers.py中的252行注释，用253和254 这样不用每次load词向量 能快点
+       非首次运行train.py的话 可以把data_helpers.py中的175行注释，用176和177 这样不用每次load词向量 能快点
      * 运行train.py 得到一个模型文件和两个词向量文件
      * 将其放入Dialog_Mdp_Web/NLU.py的self.text_model_path和 self.word2id_pkl_path, self.word_emb_path
 4. 进入Dialogue_Mdp_Web 开始运行对话系统
