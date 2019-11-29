@@ -11,17 +11,17 @@ http://www.95598.cn/static/html//person/sas//PM06001003_997.shtml
 ##### 系统介绍 - 我的中期预答辩PPT   
 
 ##### 如何运行
-1. 环境安装 python==3.6 以及 其他安装包见 requirements.txt (pip install requirements)
-2. 进入MDP文件夹，执行 python q-learning_goal.py  
+1. 环境安装 python==3.6 以及 其他安装包见 requirements.txt (pip install -r requirements)
+2. 进入MDP/Q-learning/文件夹，执行 python q-learning_goal.py  
    得到 MDP/data/Q_Table.npy 并放入 Dialog_Mdp_Web/src/generate/ （现在是已经放好的）
 3. 进入NLU文件夹
    * 对于cnn-intent-classfication
-     * 直接运行train.py 得到模型文件和词表文件
+     * 直接运行train.py 得到模型文件(cnn-intent-classification/data/runs_bandian/../checkpoints)和词表文件(在cnn-intent-classification/data/processor.vocab)
      * 将模型文件放到Dialog_Mdp_Web/NLU.py的self.intent_model_path 和 self.intent_vocab_pro
    * 对于cnn-text-classfication
      * 首先 下载自己想用的词向量（默认300维）到 Dialog_Mdp_Web/src/emb
      * 更改NLU/cnn-text-classification-tf/data_helpers.py 中的w2v_path 为Dialog_Mdp_Web/src/emb/某词向量
-       非首次运行train.py的话 可以把data_helpers.py中的252行注释，用253和254 这样不用每次load词向量 能快点
+       非首次运行train.py的话 可以把data_helpers.py中的175行注释，用176和177 这样不用每次load词向量 能快点
      * 运行train.py 得到一个模型文件和两个词向量文件
      * 将其放入Dialog_Mdp_Web/NLU.py的self.text_model_path和 self.word2id_pkl_path, self.word_emb_path
 4. 进入Dialogue_Mdp_Web 开始运行对话系统
