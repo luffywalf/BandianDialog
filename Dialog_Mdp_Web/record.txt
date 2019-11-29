@@ -1,3 +1,44 @@
+问题
+
+1. 现有系统改进：NLU不准确，NLG多样性
+2. 系统性能测试
+3. 时间安排／大论文／小论文
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 换词向量 - 300d
 统一设置路径参数 - 没找到特别好的全局参数 就在每个文件init设置吧
 
@@ -68,7 +109,6 @@ data/processor.vocab
 /Users/dingning/Ding/Python/VE/BUPT/DialogKB/NLU/resources/database/node_bandian_q_pos.csv
 
 
-
 原有的数据
 bandian_rel.csv
 bandian_entity.csv
@@ -105,3 +145,4 @@ data/processor.vocab
 
 3. inc 或 ne 与？ 这个先不管
 4. 将为您装表接电 - 应该加个结束语
+5. 买电

@@ -99,7 +99,6 @@ class NLG:
 
     def que_set(self, io_method, s_a_i, i, children_list, state_array, state_linklist):
         if s_a_i == 0:  # ( ==2 or 3) 不该有1的情况了 因为应该已经消歧过了
-            #io_method.out_fun("您属于 "+children_list[i].tag+" 吗")#14
             self.generate_answer(io_method, 14, curr_node=children_list[i])
             x_input = io_method.in_fun()
             if self.check_if_no(x_input):  # 0 不属于
@@ -174,6 +173,7 @@ class NLG:
             io_method.out_fun(self.nlg_answer_array[id])
         elif curr_node and children_list:
             #16 查一下边的信息 - 只有包括-16这一种才需要查边信息 因为我只要看是否为next
+            print("16.......")
 
             ans = ""
             for i, node in enumerate(children_list):
@@ -188,10 +188,25 @@ class NLG:
                     elif self.rel_dict[rel] == "next":
                         ans += "然后下一步的流程是"+node.tag
                     else:
+                        if len(children_list) == 1:
+                            if curr_node.tag == "流程":
+                                ans = curr_node.tag + "的第一步是" + node.tag
+                            else:
+                                ans = curr_node.tag + "是指" + node.tag
+                            break
                         if i == 0:
                             ans += curr_node.tag + self.nlg_answer_array[id] + node.tag
                         else:
                             ans += "," + node.tag
+                else:
+                    #  比如（有效营业执照复印件，营业执照复印件）之间并没有边 但他们是父子关系
+                    if len(children_list) == 1:
+                        ans = curr_node.tag + "是指" + node.tag
+                        break
+                    if i == 0:
+                        ans += curr_node.tag + self.nlg_answer_array[id] + node.tag
+                    else:
+                        ans += "," + node.tag
 
             io_method.out_fun(ans)
         elif curr_node:

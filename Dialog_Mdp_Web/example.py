@@ -50,7 +50,7 @@ if __name__ == '__main__':
         parser = argparse.ArgumentParser()
         parser.add_argument('-mode', default='web')
         parser.add_argument('-web_port', type=int, default=9999)
-        parser.add_argument('-title', default="Reverse")
+        parser.add_argument('-title', default="国家电网办电对话系统")
         parser.add_argument('-log_dir')
         parser.add_argument('-local_prompt', default="➜ ")
         opt = parser.parse_args()
