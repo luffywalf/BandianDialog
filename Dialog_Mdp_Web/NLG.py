@@ -168,7 +168,7 @@ class NLG:
 
         return state_array, state_linklist
 
-    def generate_answer(self, io_method, id, curr_node=None, children_list=None):
+    def generate_answer(self, io_method, id, curr_node=None, children_list=None, ids=[]):
         if not curr_node and not children_list:
             io_method.out_fun(self.nlg_answer_array[id])
         elif curr_node and children_list:
@@ -181,7 +181,7 @@ class NLG:
                 if rel in self.rel_dict:
                     if self.rel_dict[rel] == "pro":
                         if node.tag == "材料":
-                            ans += curr_node.tag + "是需要您携带相关材料，进行办电的申请。"
+                            ans += curr_node.tag + "时需要您携带相关材料，进行办电的申请。"
                         else:
                             ans += curr_node.tag + "是指" + node.tag + "。"
 

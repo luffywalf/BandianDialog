@@ -27,7 +27,6 @@ def run(chat,
     base_dir = os.path.dirname(os.path.abspath(__file__))
 
     if mode == 'web':
-
         class IndexHandler(web.RequestHandler):
             def get(self):
                 self.render(
@@ -41,21 +40,26 @@ def run(chat,
                 print("%s connected." % uid)
                 self.thread = Thread(target=chat, args=(self, uid))
                 self.thread.setDaemon(True)
-                self.msg = queue.Queue(maxsize=1)
+                self.msg = queue.Queue(maxsize=2)
                 self.thread.start()
 
             def on_message(self, msg):
                 if self.msg.empty():
                     self.msg.put(msg)
+                    self.msg.put(999)
 
             def on_close(self):
                 print("%s disconnected." % self.uid)
 
             def send(self, msg):
-                self.write_message(msg)
+                self.write_message("999 888 "+ msg)
+
 
             def recv(self):
+                # recv 和 on_message 一个是从队列里取 一个是往队列里面放
                 msg = self.msg.get()
+                self.msg.get()
+
                 return msg
 
         handlers = [

@@ -30,7 +30,7 @@ tf.flags.DEFINE_string("filter_sizes", "3,4,5", "Comma-separated filter sizes (d
 tf.flags.DEFINE_integer("num_filters", 128, "Number of filters per filter size (default: 128)")
 tf.flags.DEFINE_float("dropout_keep_prob", 0.5, "Dropout keep probability (default: 0.5)")
 tf.flags.DEFINE_float("l2_reg_lambda", 0.0, "L2 regularization lambda (default: 0.0)")
-tf.flags.DEFINE_integer("multilabel_threshold", 0.5, "multilabel_threshold (default: 0.5)")
+tf.flags.DEFINE_float("multilabel_threshold", 0.5, "multilabel_threshold (default: 0.5)")
 
 # Misc Parameters
 tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
@@ -45,8 +45,8 @@ class NLU:
         self.word2id_pkl_path = "/Users/dingning/Ding/Python/VE/BUPT/DialogKB/NLU/cnn-text-classification-tf/PKL/sgns.chinese/word2id.pkl"
         self.word_emb_path = "/Users/dingning/Ding/Python/VE/BUPT/DialogKB/NLU/cnn-text-classification-tf/PKL/sgns.chinese/word_embedding.npy"
         self.text_model_path = "/Users/dingning/Ding/Python/VE/BUPT/DialogKB/Bandian_Dialog/NLU/cnn-text-classification-tf/runs_bandian/1571543056/checkpoints"
-        self.intent_vocab_pro = "src/generate/processor.vocab"
-        self.intent_model_path = "/Users/didi/PycharmProjects/Bupt/BandianDialog/NLU/cnn-intent-classification/runs_bandian/1572924359/checkpoints"
+        self.intent_vocab_pro = "src/generate/vocab"
+        self.intent_model_path = "/Users/dingning/Ding/Python/VE/BUPT/DialogKB/Bandian_Dialog/NLU/cnn-intent-classification/runs_bandian/1575013334/checkpoints"
         self.bandian_node = "/Users/dingning/Ding/Python/VE/BUPT/DialogKB/NLU/resources/database/node_bandian_q_pos.csv"
 
         self.sr_word2id = pd.read_pickle(self.word2id_pkl_path)
@@ -88,7 +88,6 @@ class NLU:
             sequence_length=29,
             num_classes=2,
             vocab_size=len(self.vocab_processor.vocabulary_), # 前面 lhs rhs mismatch的错误就是因为两边的vocab不一样大
-            # vocab_size=294,
             embedding_size=128,
             filter_sizes=list(map(int, FLAGS.filter_sizes.split(","))),
             num_filters=FLAGS.num_filters,
