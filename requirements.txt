@@ -2,7 +2,7 @@ numpy
 pandas
 jieba
 gensim
-tensorflow==1.13.1
+tensorflow==2.5.1
 sklearn
 treelib
 argparse
